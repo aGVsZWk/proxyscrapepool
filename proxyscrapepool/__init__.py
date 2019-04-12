@@ -22,7 +22,9 @@ def make_celery(app):
 app = Flask('proxyscrapepool')
 app.config.from_pyfile('settings.py')
 mail = Mail(app)
-redis_store = FlaskRedis(app, decode_responses=True)
+# redis_store = FlaskRedis(app, decode_responses=True)
+redis_store = FlaskRedis.ConnectionPool(app)
+redis_store = FlaskRedis.StrictRedis(connection_pool=redis_store)
 celery = make_celery(app)
 
 from proxyscrapepool import errors, commands

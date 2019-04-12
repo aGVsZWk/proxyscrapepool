@@ -4,8 +4,14 @@ import os
 
 SECRET_KEY = 'abcdefg'
 
-# FLASK-Redis configuration
+# Flask-Redis configuration
 REDIS_URL = "redis://localhost:6379/0"
+
+# getProxy Redis configuration
+PROXY_QUEUE = "proxy_queue"
+FILTER_COLLECTOR = "proxy_filter_collector"
+PROXY_HASH_MAP = "proxy_hash_map"
+
 
 # Celery configuration
 CELERY_BROKER_URL = 'redis://localhost:6379/2'
