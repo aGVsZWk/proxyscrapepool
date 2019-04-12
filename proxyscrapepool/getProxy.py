@@ -12,7 +12,7 @@ from proxyscrapepool import redis_store
 class ProxyPool():
     def __init__(self):
         # self.con = redis_store()
-        pass
+        self.redis_store = redis_store
 
     def get_proxies(self, type):
         file_url = {
@@ -60,32 +60,33 @@ class ProxyPool():
         return ok_validated_proxies, nok_validated_proxies
 
 
-    def generate_filter(self, proxy):
-        sha1 = hashlib.sha1()
-        sha1.update(str(proxy).encode())
-        proxy_figer_print = sha1.hexdigest()
-        figer_print_list = redis_store.smembers(FILTER_COLLECTOR)
-        if proxy_figer_print not in figer_print_list:
-            redis_store.sadd(FILTER_COLLECTOR, proxy_figer_print)
-            redis_store.lpush(PROXY_QUEUE, proxy_figer_print)
-            return {proxy_figer_print: proxy}
-
-
     def filter_proxies(self, to_filter_proxies, type):    # todo 速度
         # for proxy in to_filter_proxies:
         #     ip = proxy[:proxy.rfind(":")]
         #     port = proxy[proxy.rfind(":")+1:]
-        to_generate_filter = [{"protocol_type": type, "ip": proxy[:proxy.rfind(":")], "port": proxy[proxy.rfind(":")+1:]} for proxy in to_filter_proxies]
+        print(len(to_filter_proxies), type)
+        to_generate_figer = [{"protocol_type": type, "ip": proxy[:proxy.rfind(":")], "port": proxy[proxy.rfind(":")+1:]} for proxy in to_filter_proxies]
+        # figer_print_list = self.redis_store.smembers(FILTER_COLLECTOR)
+        figer_print_list = []
+        to_add_collector = []
+        to_add_queue = []
+        to_add_hashmap = []
+        for proxy in to_generate_figer:
+            sha1 = hashlib.sha1()
+            sha1.update(str(proxy).encode())
+            proxy_figer_print = sha1.hexdigest()
+            if proxy_figer_print not in figer_print_list:
+                to_add_collector.append(proxy_figer_print)
+                to_add_queue.append(proxy_figer_print)
+                to_add_hashmap.append({proxy_figer_print: proxy})
 
-
-        figer_print_list = redis_store.smembers(FILTER_COLLECTOR)
-        proxy_figer_print_map = []
-        for i in to_generate_filter:
-            proxy_figer_print_map.append(self.generate_filter(i))
-        print(proxy_figer_print_map)
+        # self.redis_store.sadd(FILTER_COLLECTOR, *to_add_collector)    # todo redis连接对象多线程操作会出问题，多进程ok
+        # self.redis_store.lpush(PROXY_QUEUE, *to_add_queue)
+        print(to_add_hashmap)
+        print(len(to_add_hashmap), type)
 
         # try:
-        #     proxies_set = redis_store.lrange("proxies", 0, -1)  # todo 去重改成redis的集合，存储改成hashmap，顺序改成列表
+        #     proxies_set = redis_store.lrange("proxies", 0, -1)
         # except Exception:
         #     proxies_set = {}
         # to_save_proxies = [proxy for proxy in to_filter_proxies if proxy not in proxies_set]
@@ -117,17 +118,10 @@ class ProxyPool():
         print("进程池已经启动")
         pool.close()
         pool.join()     # 等待子进程结束
-
-
         print("已经爬取完成")
 
 
         # self.type_run("socks5")
-
-
-
-
-
 
 
 
