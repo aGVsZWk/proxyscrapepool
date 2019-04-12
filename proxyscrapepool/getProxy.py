@@ -2,9 +2,9 @@
 # author: Luke
 import grequests
 import requests
-from multiprocessing import Pool
+from multiprocessing.dummy import Pool
 import time
-from app import redis_store
+from proxyscrapepool import redis_store
 
 
 class ProxyPool():
@@ -84,5 +84,9 @@ class ProxyPool():
         pool.join()     # 等待子进程结束
         print("已经爬取完成")
 
-
-
+# if __name__ == '__main__':
+#     start_time = time.time()
+#     pp = ProxyPool()
+#     pp.process_run()
+#     end_time = time.time()
+#     print(end_time - start_time)
