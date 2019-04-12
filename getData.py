@@ -2,6 +2,7 @@
 # author: Luke
 import grequests
 import requests
+from multiprocessing import Pool
 import time
 from app import redis_store
 
@@ -13,9 +14,9 @@ class ProxyPool():
 
     def get_proxies(self, type):
         file_url = {
-            "socks5": "https://api.proxyscrape.com?request=getproxies&proxytype=socks5&timeout=1000&country=all&uptime=0",
-            "socks4": "https://api.proxyscrape.com?request=getproxies&proxytype=socks4&timeout=1000&country=all&uptime=0",
-            "http": "https://api.proxyscrape.com?request=getproxies&proxytype=http&timeout=1000&country=all&ssl=all&anonymity=all&uptime=0"
+            "socks5": "https://api.proxyscrape.com?request=getproxies&proxytype=socks5&timeout=300&country=all&uptime=0",
+            "socks4": "https://api.proxyscrape.com?request=getproxies&proxytype=socks4&timeout=100&country=all&uptime=0",
+            "http": "https://api.proxyscrape.com?request=getproxies&proxytype=http&timeout=100&country=all&ssl=all&anonymity=all&uptime=0"
         }
 
         try:
@@ -39,7 +40,7 @@ class ProxyPool():
         }
         my_proxies_list = [{key: value + proxy for key, value in protocol_type[type].items()} for proxy in
                            to_validate_proxies]
-        print("待验证代理数量:", len(my_proxies_list))
+        print("待验证代理数量:", len(my_proxies_list), "爬取的类型:", type)
         start_time = time.time()
         do_validate_requests = [
             # grequests.get('https://www.baidu.com/', proxies=my_proxies, timeout=10, headers=my_headers) for my_proxies
@@ -52,58 +53,36 @@ class ProxyPool():
         ok_validated_proxies = [to_validate_proxies[i] for i in ok_response]    # 可用代理
         nok_validated_proxies = [to_validate_proxies[i] for i in nok_response]    # 可用代理
         end_time = time.time()
-        print("可用代理数量:",len(ok_validated_proxies))
+        print("可用代理数量:",len(ok_validated_proxies), "爬取的类型:", type)
+        print(ok_validated_proxies)
         print("耗费时间:", end_time - start_time)
         return ok_validated_proxies, nok_validated_proxies
 
 
     def filter_proxies(self, to_filter_proxies, type):    # todo 增加类型，速度
         try:
-            proxies_set = redis_store.lrange("proxies", 0, -1)  # todo 去重改成redis的集合
+            proxies_set = redis_store.lrange("proxies", 0, -1)  # todo 去重改成redis的集合，存储改成hashmap，顺序改成列表
         except Exception:
             proxies_set = {}
         to_save_proxies = [proxy for proxy in to_filter_proxies if proxy not in proxies_set]
         if to_save_proxies:
             redis_store.lpush("proxies", *to_save_proxies)
-        print("存储的代理数量:", len(to_save_proxies))
+        print("存储的代理数量:", len(to_save_proxies), "爬取的类型:", type)
 
 
-    def run(self):
-        proxies = self.get_proxies('socks5')
-        ok_proxies, _ = self.valite_proxies(proxies, "socks5")
-        self.filter_proxies(ok_proxies, "socks5")
+    def type_run(self, type):
+        proxies = self.get_proxies(type)
+        ok_proxies, _ = self.valite_proxies(proxies, type)
+        self.filter_proxies(ok_proxies, type)
 
-# def exception_handler(request, exception):
-#     print(request, "Request failed")
-#
-#
-# f = open("proxy.txt", "r")
-# ctx = f.read()
-# ip_port = ctx.split('\n')[:-1]
-#
-# my_headers = {
-#     'User-Agent': 'Mozilla/5.0(iPhone;U;CPUiPhoneOS4_3_3likeMacOSX;en-us)AppleWebKit/533.17.9(KHTML,likeGecko)Version/5.0.2Mobile/8J2Safari/6533.18.5'}
-#
-# my_proxies_list = [{"http": "socks5://" + add, "https": "socks5://" + add} for add in ip_port]
-#
-# start_time = time.time()
-#
-# reqs_list = [
-#     grequests.get('https://www.baidu.com/', proxies=my_proxies, timeout=3, headers=my_headers) for my_proxies in
-#     my_proxies_list
-# ]
-# res = grequests.map(reqs_list, exception_handler=exception_handler)
-# oks = [res.index(r) for r in res if r]
-# print(oks)
-# result = [my_proxies_list[i] for i in oks]
-# end_time = time.time()
-# print(end_time - start_time)
-#
-# with open("ok.txt", "w") as f:
-#     for i in result:
-#         f.write(str(i) + "\n")
+    def process_run(self):
+        pool = Pool(processes=3)
+        for protocol_type in ["socks5", "socks4", "http"]:
+            pool.apply_async(self.type_run, (protocol_type,))
+        print("进程池已经启动")
+        pool.close()
+        pool.join()     # 等待子进程结束
+        print("已经爬取完成")
 
 
-if __name__ == '__main__':
-    pp = ProxyPool()
-    pp.run()
+
