@@ -5,7 +5,10 @@ import os
 SECRET_KEY = 'abcdefg'
 
 # Flask-Redis configuration
-REDIS_URL = "redis://localhost:6379/0"
+# REDIS_URL = "redis://localhost:6379/0"
+PORT = 6379
+HOST = 'localhost'
+DB = 0
 
 # getProxy Redis configuration
 PROXY_QUEUE = "proxy_queue"

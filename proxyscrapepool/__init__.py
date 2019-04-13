@@ -5,6 +5,10 @@ from flask import Flask
 from flask_redis import FlaskRedis
 from flask_mail import Mail
 from celery import Celery
+from redis import Redis, ConnectionPool
+
+from proxyscrapepool.settings import DB, PORT, HOST
+
 
 def make_celery(app):
     celery = Celery(app.name, broker=app.config["CELERY_BROKER_URL"], backend=app.config["CELERY_RESULT_BACKEND"])
@@ -22,7 +26,8 @@ def make_celery(app):
 app = Flask('proxyscrapepool')
 app.config.from_pyfile('settings.py')
 mail = Mail(app)
-redis_store = FlaskRedis(app, decode_responses=True)
+redis_store = FlaskRedis(app, decode_responses=True, strict=False)
+
 celery = make_celery(app)
 
 from proxyscrapepool import errors, commands
