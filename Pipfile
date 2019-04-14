@@ -1,0 +1,25 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+flask = "==0.12"
+flask-mail = "==0.9.1"
+redis = "==2.10.6"
+requests = "==2.21.0"
+grequests = "==0.3.0"
+flask-redis = "==0.3.0"
+flask-restful = "==0.3.7"
+flask-wtf = "==0.14.2"
+flask-script = "==2.0.6"
+flask-cors = "==3.0.7"
+flask-migrate = "==2.3.1"
+python-dotenv = "==0.10.1"
+watchdog = "==0.9.0"
+celery = "==3.1.17"
+
+[requires]
+python_version = "3.6"

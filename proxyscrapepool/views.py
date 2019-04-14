@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 # author: Luke
-from flask import request, render_template, session, flash, redirect, url_for
+from flask import request, render_template, session, flash, redirect, url_for, jsonify
 
-from proxyscrapepool import app
+from proxyscrapepool import app, redis_store
+from proxyscrapepool.settings import PROXY_HASH_MAP
 from .tasks import  send_async_email_task, get_proxy_task
 from flask_mail import Message
 
@@ -36,3 +37,10 @@ def send_mail():
 def proxy_start():
     get_proxy_task.apply_async()
     return "<h1>启动成功</h1>"
+
+
+
+@app.route('/get_proxy')
+def get_proxy():
+    proxies = redis_store.hgetall(PROXY_HASH_MAP)
+    return jsonify(proxies)

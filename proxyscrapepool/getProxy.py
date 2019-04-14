@@ -16,8 +16,8 @@ class ProxyPool():
     def get_proxies(self, type):
         file_url = {
             "socks5": "https://api.proxyscrape.com?request=getproxies&proxytype=socks5&timeout=500&country=all&uptime=0",
-            "socks4": "https://api.proxyscrape.com?request=getproxies&proxytype=socks4&timeout=300&country=all&uptime=0",
-            "http": "https://api.proxyscrape.com?request=getproxies&proxytype=http&timeout=300&country=all&ssl=all&anonymity=all&uptime=0"      # 可手动调节timeout获取不同延迟ip
+            "socks4": "https://api.proxyscrape.com?request=getproxies&proxytype=socks4&timeout=200&country=all&uptime=0",
+            "http": "https://api.proxyscrape.com?request=getproxies&proxytype=http&timeout=200&country=all&ssl=all&anonymity=all&uptime=0"      # 可手动调节timeout获取不同延迟ip
         }
         try:
             response = requests.get(file_url[type])
@@ -63,10 +63,11 @@ class ProxyPool():
                 to_add_collector.append(proxy_figer_print)
                 to_add_queue.append(proxy_figer_print)
                 to_add_hashmap.append({"figer": proxy_figer_print,"proxy": proxy})
-        redis_store.sadd(FILTER_COLLECTOR, *to_add_collector)
-        redis_store.lpush(PROXY_QUEUE, *to_add_queue)
-        for add_hash_map in to_add_hashmap:
-            redis_store.hset(PROXY_HASH_MAP, add_hash_map['figer'], add_hash_map['proxy'])
+        if to_add_collector:
+            redis_store.sadd(FILTER_COLLECTOR, *to_add_collector)
+            redis_store.lpush(PROXY_QUEUE, *to_add_queue)
+            for add_hash_map in to_add_hashmap:
+                redis_store.hset(PROXY_HASH_MAP, add_hash_map['figer'], add_hash_map['proxy'])
         return len(to_add_hashmap)
 
     def type_run(self, type):
@@ -86,8 +87,8 @@ class ProxyPool():
     def process_run(self):
         start_time = time.time()
         pool = Pool(processes=10)
-        # for protocol_type in ["socks5","socks4", "http"]:
-        for protocol_type in ["socks5"]:
+        for protocol_type in ["socks5","socks4", "http"]:
+        # for protocol_type in ["socks5"]:
             pool.apply_async(self.type_run, (protocol_type,))
         print("程序已经启动")
         pool.close()
@@ -95,10 +96,6 @@ class ProxyPool():
         add_proxy_nums = self.filter_proxies(self.ok_proxies)
         end_time = time.time()
         print("程序已经运行完毕，消耗时间为:%f，增加的代理数量为%d" % (end_time - start_time, add_proxy_nums))
-
-
-
-
 
 if __name__ == '__main__':
     pp = ProxyPool()

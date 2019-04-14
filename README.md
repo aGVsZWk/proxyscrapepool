@@ -5,12 +5,20 @@
 目前代理的主要来源是 **https://proxyscrape.com/**
 
 ## 实现方式
-采用flask提供接口，可选用redis进行存储，也可直接采用记事本文档的方式进行存储。
+flask提供接口，目录管理采用包管理结构；代理池的存储用的是redis；定时抓取用的是celery。
+
+## 环境搭建
+### 采用pipenv控制项目虚拟环境，用python-dotenv实现激活项目虚拟环境加载.env中的环境变量
+### 先安装pipenv第三包扩展包
+### 安装项目虚拟环境：`pipenv install`
+### 激活项目虚拟环境: `pipenv shell`
+
 
 ## 项目启动
+### 需要自己配置项目的.env文件，里面是需要加载的环境变量
 ### celery启动方式: `celery worker -A proxyscrapepool.celery --loglevel=info`
 ### celery定时任务方式: `celery -A proxyscrapepool.celery beat`
-### flask项目目录采用包管理方式，直接启动就好
+### 运行manager.py
 
 
 ## 未完成事件
