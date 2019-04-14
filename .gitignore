@@ -1,19 +1,13 @@
 # pycharm
 .idea/
-
 # cache
 .py[cod]
-
 # log
 logs/log*
-
-
 # celery
 .bak
 .dat
 .dir
 .pid
-
-
 # env
 .env
