@@ -9,6 +9,7 @@
 
 ## 项目启动
 ### celery启动方式: `celery worker -A proxyscrapepool.celery --loglevel=info`
+### celery定时任务方式: `celery -A proxyscrapepool.celery beat`
 ### flask项目目录采用包管理方式，直接启动就好
 
 

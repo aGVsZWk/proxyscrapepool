@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # author: Luke
 import os
+from celery.schedules import crontab
 
 SECRET_KEY = 'abcdefg'
 
@@ -19,6 +20,14 @@ PROXY_HASH_MAP = "proxy_hash_map"
 # Celery configuration
 CELERY_BROKER_URL = 'redis://localhost:6379/2'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
+CELERYBEAT_SCHEDULE = {
+    'getData':{
+        'task':'proxyscrapepool.tasks.get_proxy_task',
+        "schedule": crontab(minute='*/5'),
+    }
+#
+}
+
 
 
 # Flask-Mail configuration

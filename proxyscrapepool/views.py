@@ -34,5 +34,5 @@ def send_mail():
 
 @app.route('/start_proxy')
 def proxy_start():
-    get_proxy_task.apply_async(countdown=60)
+    get_proxy_task.apply_async()
     return "<h1>启动成功</h1>"
