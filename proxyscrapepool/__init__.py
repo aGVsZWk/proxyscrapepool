@@ -6,8 +6,8 @@ from flask_redis import FlaskRedis
 from flask_mail import Mail
 from celery import Celery
 from redis import Redis, ConnectionPool
-
-from proxyscrapepool.settings import DB, PORT, HOST
+from flask_mongoengine import MongoEngine
+from proxyscrapepool.settings import REDIS_DB, REDIS_PORT, REDIS_HOST
 
 
 def make_celery(app):
@@ -27,8 +27,9 @@ app = Flask('proxyscrapepool')
 app.config.from_pyfile('settings.py')
 mail = Mail(app)
 redis_store = FlaskRedis(app, decode_responses=True, strict=False)
-
+db = MongoEngine(app)
 celery = make_celery(app)
 
 from proxyscrapepool import errors, commands
 from proxyscrapepool.views import *
+from proxyscrapepool.restfulViews import *

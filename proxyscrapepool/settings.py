@@ -8,9 +8,29 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'secret string')
 
 # Flask-Redis configuration
 # REDIS_URL = "redis://localhost:6379/0"
-PORT = 6379
-HOST = 'localhost'
-DB = 0
+REDIS_PORT = 6379
+REDIS_HOST = 'localhost'
+REDIS_DB = 0
+
+# flask-mongoengine configuration
+MONGODB_DB = 'proxyscrapepool'
+MONGODB_HOST = 'localhost'
+MONGODB_PORT = 27017
+# MONGODB_USERNAME = 'luke'
+# MONGODB_PASSWORD =
+# MONGODB_CONNECT = False
+# or
+# MONGODB_SETTINGS = {
+#     'db': 'project1',
+#     'host': '192.168.1.35',
+#     'port': 12345,
+#     'username':'webapp',
+#     'password':'pwd123',
+#     # 'connect': False
+# }
+
+
+
 
 # getProxy Redis configuration
 PROXY_QUEUE = "proxy_queue"

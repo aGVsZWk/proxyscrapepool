@@ -38,8 +38,6 @@ def proxy_start():
     get_proxy_task.apply_async()
     return "<h1>启动成功</h1>"
 
-
-
 @app.route('/get_proxy')
 def get_proxy():
     proxies = redis_store.hgetall(PROXY_HASH_MAP)
