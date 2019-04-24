@@ -7,7 +7,7 @@ import time
 import hashlib
 from proxyscrapepool import redis_store
 from proxyscrapepool.settings import PROXY_QUEUE, FILTER_COLLECTOR, PROXY_HASH_MAP
-
+import pickle
 
 class ProxyPool():
     def __init__(self):
@@ -15,9 +15,9 @@ class ProxyPool():
 
     def get_proxies(self, type):
         file_url = {
-            "socks5": "https://api.proxyscrape.com?request=getproxies&proxytype=socks5&timeout=500&country=all&uptime=0",
-            "socks4": "https://api.proxyscrape.com?request=getproxies&proxytype=socks4&timeout=200&country=all&uptime=0",
-            "http": "https://api.proxyscrape.com?request=getproxies&proxytype=http&timeout=200&country=all&ssl=all&anonymity=all&uptime=0"      # 可手动调节timeout获取不同延迟ip
+            "socks5": "https://api.proxyscrape.com?request=getproxies&proxytype=socks5&timeout=300&country=all&uptime=0",
+            "socks4": "https://api.proxyscrape.com?request=getproxies&proxytype=socks4&timeout=100&country=all&uptime=0",
+            "http": "https://api.proxyscrape.com?request=getproxies&proxytype=http&timeout=100&country=all&ssl=all&anonymity=all&uptime=0"      # 可手动调节timeout获取不同延迟ip
         }
         try:
             response = requests.get(file_url[type])
@@ -87,8 +87,8 @@ class ProxyPool():
     def process_run(self):
         start_time = time.time()
         pool = Pool(processes=10)
-        for protocol_type in ["socks5","socks4", "http"]:
-        # for protocol_type in ["socks5"]:
+        # for protocol_type in ["socks5","socks4", "http"]:
+        for protocol_type in ["socks5"]:
             pool.apply_async(self.type_run, (protocol_type,))
         print("程序已经启动")
         pool.close()

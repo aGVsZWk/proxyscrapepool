@@ -41,4 +41,5 @@ def proxy_start():
 @app.route('/get_proxy')
 def get_proxy():
     proxies = redis_store.hgetall(PROXY_HASH_MAP)
+    print(proxies)
     return jsonify(proxies)

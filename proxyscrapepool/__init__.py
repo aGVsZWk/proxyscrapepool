@@ -26,7 +26,8 @@ def make_celery(app):
 app = Flask('proxyscrapepool')
 app.config.from_pyfile('settings.py')
 mail = Mail(app)
-redis_store = FlaskRedis(app, decode_responses=True, strict=False)
+# redis_store = FlaskRedis(app, ddecode_responses=True, strict=False)
+redis_store = FlaskRedis(app)
 db = MongoEngine(app)
 celery = make_celery(app)
 
