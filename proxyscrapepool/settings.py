@@ -34,19 +34,17 @@ MONGODB_PORT = 27017
 
 # getProxy Redis configuration
 PROXY_QUEUE = "proxy_queue"
-FILTER_COLLECTOR = "proxy_filter_collector"
-PROXY_HASH_MAP = "proxy_hash_map"
-
-
+PROXY_COLLECTOR = "proxy_collector"
+INTERVAL_TIME = 1
+RETRY_TIMES = 3
 # Celery configuration
 CELERY_BROKER_URL = 'redis://localhost:6379/2'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
 CELERYBEAT_SCHEDULE = {
     'getData':{
         'task':'proxyscrapepool.tasks.get_proxy_task',
-        "schedule": crontab(minute='*/5'),
+        "schedule": crontab(minute='*/15'),
     }
-#
 }
 
 

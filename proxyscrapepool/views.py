@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 # author: Luke
 from flask import request, render_template, session, flash, redirect, url_for, jsonify
-
+import pickle
 from proxyscrapepool import app, redis_store
-from proxyscrapepool.settings import PROXY_HASH_MAP
+from proxyscrapepool.settings import PROXY_QUEUE
 from .tasks import  send_async_email_task, get_proxy_task
 from flask_mail import Message
 
@@ -40,6 +40,6 @@ def proxy_start():
 
 @app.route('/get_proxy')
 def get_proxy():
-    proxies = redis_store.hgetall(PROXY_HASH_MAP)
-    print(proxies)
+    to_decode_proxies = redis_store.lrange(PROXY_QUEUE, 0, -1)
+    proxies = [pickle.loads(proxy) for proxy in to_decode_proxies]
     return jsonify(proxies)
