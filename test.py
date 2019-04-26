@@ -3,11 +3,13 @@
 # redis并发测试
 import hashlib
 import time
+
+import requests
 from redis import Redis
 from multiprocessing.dummy import Pool
 from proxyscrapepool import redis_store
+from fake_useragent import UserAgent
 
-from proxyscrapepool.settings import PROXY_QUEUE, FILTER_COLLECTOR
 import os
 # redis_store = Redis(host="localhost", port=6379, db=0)
 redis_store = redis_store
@@ -29,6 +31,23 @@ class Test():
         pool.close()
         pool.join()
 
+class newTest(Test):
+    def run(self):
+
+        self.headers = {'User-Agent': UserAgent().random}
+        print(self.headers)
+        self.url1 = "https://www.google.com.hk/"
+        self.url2 = "https://www.baidu.com"
+        self.url3 = "https://www.facebook.com"
+        self.url4 = "https://twitter.com/login?lang=zh-cn"
+        try:
+            response = requests.get(self.url3, proxies={'http': 'socks5://195.96.77.186:5555', 'https': 'socks5://195.96.77.186:5555'}, headers=self.headers)
+            print(response.text)
+        except Exception as e:
+            print(e)
+
+
+
 if __name__ == '__main__':
-    t = Test()
+    t = newTest()
     t.run()

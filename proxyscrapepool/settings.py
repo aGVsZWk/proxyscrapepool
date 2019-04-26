@@ -43,10 +43,11 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
 CELERYBEAT_SCHEDULE = {
     'getData':{
         'task':'proxyscrapepool.tasks.get_proxy_task',
-        "schedule": crontab(minute='*/15'),
+        "schedule": crontab(minute='*/5'),
     }
 }
-
+CELERYD_CONCURRENCY = 2      # celery worker concurrent quantity
+CELERYD_MAX_TASKS_PER_CHILD = 2   # worker finished tasks number before died
 
 
 # Flask-Mail configuration

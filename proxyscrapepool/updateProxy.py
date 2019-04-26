@@ -15,10 +15,14 @@ class AdvanceProxy():
             'User-Agent': 'Mozilla/5.0(iPhone;U;CPUiPhoneOS4_3_3likeMacOSX;en-us)AppleWebKit/533.17.9(KHTML,likeGecko)Version/5.0.2Mobile/8J2Safari/6533.18.5'
         }
         self.url1 = 'https://www.baidu.com/'
-        self.url2 = None
+        self.url2 = 'https://www.google.com/'
 
     def get_proxy(self):
         temp_proxy = redis_store.lpop(PROXY_QUEUE)
+        while not temp_proxy:
+            print("get proxy failture, try again")
+            time.sleep(10)
+            temp_proxy = redis_store.lpop(PROXY_QUEUE)
         proxy = pickle.loads(temp_proxy)
         print("get proxy", proxy)
         return proxy
@@ -28,7 +32,7 @@ class AdvanceProxy():
         is_ok = False
         while times < 3 and not is_ok:
             try:
-                response = requests.get(self.url1, headers=self.headers, proxies=proxy)
+                response = requests.get(self.url1, headers=self.headers, proxies=proxy, timeout=6)
             except Exception as e:
                 print("failure times", times+1, proxy)
                 response = False
@@ -39,6 +43,23 @@ class AdvanceProxy():
             time.sleep(INTERVAL_TIME)
         print("is ok?", is_ok, proxy)
         return is_ok
+
+    def proxy_is_outwall(self, proxy):
+        times = 0
+        is_outwall = False
+        while times < 3 and not is_outwall:
+            try:
+                response = requests.get(self.url2, headers=self.headers, proxies=proxy, timeout=6)
+            except Exception as e:
+                print("failure times", times+1, proxy)
+                response = False
+            if response:
+                response.close()
+                is_outwall = True
+            times += 1
+            time.sleep(INTERVAL_TIME)
+        print("is outwall?", is_outwall, proxy)
+        return is_outwall
 
     def update_queue(self, proxy):
         to_save_proxy = pickle.dumps(proxy)

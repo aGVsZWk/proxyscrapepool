@@ -20,11 +20,11 @@
 
 ## 项目启动
 #### 需要自己配置项目的.env文件，里面是需要加载的环境变量
-#### celery启动方式: `celery worker -A proxyscrapepool.celery --loglevel=info`，linux用户如果使用root用户运行，需要设置环境变量`export `
+#### celery启动方式: `nohup celery worker -A proxyscrapepool.celery --loglevel=info > celery_worker.out`，linux用户如果使用root用户运行，需要设置环境变量`export `
 
-#### celery定时任务方式: `celery -A proxyscrapepool.celery beat`
+#### celery定时任务方式: `nohup celery -A proxyscrapepool.celery beat > celery_beat.out`
 #### 运行manager.py
-
+#### 对代理队列进行动态维护: `nohup python updateProxy.py > updateProxy.out`
 
 ## 未完成事件
 #### 1. 增加代理来源
